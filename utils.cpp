@@ -333,7 +333,49 @@ int read_lex(map<string, double> &lex) {
     }
     cout << "Number of lexicon words are -> " << lex.size() << endl;
     */
-    
+
     lex_file.close();
+    return 0;
+}
+
+int read_bitcoins(vector<vector<string>> &bc_vect) {
+    ifstream bitcoins_file;
+    string line,temp_str;
+    double curr_lex_val = 0.0;
+    string temp_copy;
+
+    vector<string> temp_vect;
+
+    // read file 
+    bitcoins_file.open(F_BIT);
+    if (!bitcoins_file.is_open()) {
+        cout << "Cant find file lex_file please check the path\n";
+        return -1;
+    }
+
+    while(getline(bitcoins_file,line)) {       
+
+        istringstream curr_line(line);
+
+        while (getline(curr_line, temp_str, '\t')) {
+            temp_vect.push_back(temp_str); 
+        }
+        bc_vect.push_back(temp_vect);
+        temp_vect.clear();
+    }
+
+    //print vector
+    /*
+    for (auto& vec : bc_vect) {
+        for (int i = 0; i < vec.size() ; i++) {
+            cout <<"|" << vec[i] << "|";
+        }
+        
+        cout << "\n";
+    }
+    */
+
+    bitcoins_file.close();
+
     return 0;
 }

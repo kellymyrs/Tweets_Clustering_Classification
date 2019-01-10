@@ -26,9 +26,12 @@
 #include "User.h"
 #include "Cluster.h"
 #define F_LEX "./vader_lexicon.csv"
+#define F_BIT "./coins_queries.csv"
 using namespace std;
 
 void com_line_parser(int argc,char* argv[],ifstream& input_file,ofstream& output_file,int& validation);
 void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d,int& P);
+
 int read_lex(map<string, double> &);
+int read_bitcoins(vector<vector<string>> &);
 #endif
