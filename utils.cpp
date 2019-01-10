@@ -293,3 +293,47 @@ void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d,
 //     }    
 // } 
 
+int read_lex(map<string, double> &lex) {
+    ifstream lex_file;
+    string line,temp_str;
+    double curr_lex_val = 0.0;
+    string temp_copy;
+    // read file 
+    lex_file.open(F_LEX);
+    if (!lex_file.is_open()) {
+        cout << "Cant find file lex_file please check the path\n";
+        return -1;
+    }
+
+
+    while(getline(lex_file,line)) {
+        istringstream curr_line(line);
+
+        //read character
+        getline(curr_line, temp_str, '\t');
+        temp_copy = temp_str;
+
+        // debug print
+        //cout << "{" << temp_str << "}---{"; 
+
+        //read value
+        getline(curr_line, temp_str, '\t');
+        curr_lex_val = atof(temp_str.c_str());
+
+        lex[temp_copy] = curr_lex_val;
+
+        //debug print
+        //cout << curr_lex_val << "}"<< endl;
+    }
+
+    // print map storage
+    /*
+    for (auto& entry: lex) {
+        cout << "{" <<entry.first << "}---{" << entry.second << "}" << '\n';
+    }
+    cout << "Number of lexicon words are -> " << lex.size() << endl;
+    */
+    
+    lex_file.close();
+    return 0;
+}
