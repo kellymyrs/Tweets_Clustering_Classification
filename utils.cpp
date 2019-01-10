@@ -1,5 +1,4 @@
 #include "utils.h"
-
 void com_line_parser(int argc,char* argv[],ifstream& input_file,ofstream& output_file,int& validation){
 	for( int i = 1 ; i < argc - 1 ; i++) {
 		if(!strcmp(argv[i],"-d")){         //input file
@@ -17,11 +16,11 @@ void com_line_parser(int argc,char* argv[],ifstream& input_file,ofstream& output
 
 }
 
-void read_input(ifstream &input_file,vector<struct User*> &users,int &N,int &d,int& P){
+void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d,int& P){
 	string line,temp_str;
 	struct Tweet* tweet;
     struct User* user; 
-    int i = 1,tweetid,userid;
+    int i = 1,tweetid,userid=-1,id;
     vector<string> w;
 
     while(getline(input_file,line)) {
@@ -29,30 +28,46 @@ void read_input(ifstream &input_file,vector<struct User*> &users,int &N,int &d,i
         istringstream curr_line(line);
 
         //user id
-        getline(curr_line, temp_str, ',');
-        userid = atoi(temp_str.c_str());
-        cout << "User id = " << userid << endl;
+        getline(curr_line, temp_str, '\t');
+        id = atoi(temp_str.c_str());
+        //cout << "User id = " << userid << endl;
 
         //tweet id
-        getline(curr_line, temp_str, ',');
+        getline(curr_line, temp_str, '\t');
         tweetid = atoi(temp_str.c_str());
-        cout << "Tweet id = " << tweetid << endl;
+        //cout << "Tweet id = " << tweetid << endl;
 
         d = 1;
-        while (getline(curr_line, temp_str, ',')) {
+        while (getline(curr_line, temp_str, '\t')) {
 
-            cout << temp_str.c_str() << " ";
+            //cout << temp_str.c_str() << " ";
             w.push_back(temp_str.c_str()); 
             d++;
         }
         cout << endl;
 
         tweet = new struct Tweet(tweetid,w);
-        user = new struct User(userid , tweet);
-        users.push_back(user);
+        if( userid == id){ //add new tweet to the existing user
+            users[i-1]->tweets.push_back(tweet);
+        }
+        else{//create a new user
+            user = new struct User(userid , tweet);
+            users.push_back(user);    
+        }
+        
+        
+        // auto res = users.find(userid);
+        // if (res != users.end()) {
+        //     cout << "Found " << res->first << '\n';
+        //     res->second.tweets.push_back(tweet);
+
+        // } 
+        // else {
+        //     std::cout << "Not found\n";
+        //     users.emplace(make_pair(userid, user));
+        // }
 
         w.clear();
-        
         i++; 
     }
 
@@ -65,6 +80,7 @@ void read_input(ifstream &input_file,vector<struct User*> &users,int &N,int &d,i
     //     items[i]->Print_Item();
     // }
     
+
     cout << "Number of tweets = " << N << endl;
     cout << "Number of words = " << d << endl;
         

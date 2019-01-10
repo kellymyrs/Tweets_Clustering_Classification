@@ -21,6 +21,7 @@
 #include <ctime>
 #include <limits>
 #include <iomanip>
+#include <map>
 #include "Tweet.h"
 #include "User.h"
 #include "Cluster.h"
@@ -28,6 +29,6 @@
 using namespace std;
 
 void com_line_parser(int argc,char* argv[],ifstream& input_file,ofstream& output_file,int& validation);
-void read_input(ifstream &input_file,vector<struct User*> &users,int &N,int &d,int& P);
+void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d,int& P);
 
 #endif

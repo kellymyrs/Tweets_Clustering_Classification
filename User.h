@@ -21,7 +21,7 @@ using namespace std;
 
 struct User{
 	int id;
-	vector <double> u;
+  
 	vector <bool> uex;
 	vector <struct Tweet*> tweets;
 
