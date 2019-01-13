@@ -1,5 +1,5 @@
 #include "utils.h"
-void com_line_parser(int argc,char* argv[],ifstream& input_file,ofstream& output_file,int& validation){
+void com_line_parser(int argc,char* argv[],ifstream& input_file,ofstream& output_file,int & validation){
 	for( int i = 1 ; i < argc - 1 ; i++) {
 		if(!strcmp(argv[i],"-d")){         //input file
 			input_file.open(argv[i+1]);
@@ -16,7 +16,7 @@ void com_line_parser(int argc,char* argv[],ifstream& input_file,ofstream& output
 
 }
 
-void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int d){
+void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d){
 	string line,temp_str;
 	struct Tweet* tweet;
     struct User* user; 
@@ -188,7 +188,7 @@ int read_bitcoins(vector<vector<string>> &bc_vect) {
 }
 
 
-void find_P_NN(vector <struct User*> &users,vector<struct Item <double>*>& pnearest,int &d){
+void find_P_NN(vector <struct User*> &users,vector<struct Item <double>*>& pnearest,int d){
     Cosine_Lsh_Hashtable* co_h;
     uint32_t t_size;
     struct Item <double>* item;

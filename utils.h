@@ -36,12 +36,12 @@
 #define P 20
 using namespace std;
 
-void com_line_parser(int argc,char* argv[],ifstream& input_file,ofstream& output_file,int& validation);
-void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d);
+void com_line_parser(int ,char** ,ifstream &,ofstream &,int &);
+void read_input(ifstream &,vector <struct User*> &,int &,int &);
 
 int read_lex(map<string, double> &);
 int read_bitcoins(vector<vector<string>> &);
 
-void find_P_NN(vector <struct User*> &users,vector<struct Item <double>*>& pnearest,int d);
-void unrated_items(vector <struct User*> &users,vector<struct Item <double>*>& pnearest);
+void find_P_NN(vector <struct User*> &,vector<struct Item <double>*>&,int);
+void unrated_items(vector <struct User*> &,vector<struct Item <double>*>&);
 #endif
