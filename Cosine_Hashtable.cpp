@@ -96,6 +96,54 @@ struct Item<double>* Cosine_Hash_Member::Combine(vector<double>& c,double& temp_
 
 }
 
+void Cosine_Hashtable::Get_Bucket(vector<double>& c,uint32_t& t_size,vector<struct Item <double>*>& range){
+    struct Item <double>* temp_item = NULL;
+    double temp_dist;
+
+    //cout << endl << endl << "Searching Hashtable" << endl;
+
+    uint32_t cg = g_h->Calculate_G(c);
+
+
+    //search bucket
+    auto search = hashtable.find(cg);
+    if(search != hashtable.end()){
+
+        //cout << "Searching bucket" << endl;
+        for (int i = 0; i < search->second.size(); i++){
+
+            //cout << "Combining" << endl;
+            temp_item = search->second[i]->Combine(c,temp_dist);
+
+            //cout << "Temp Item coordinates : ";
+            //for (int j = 0; j < temp_item->coordinates.size() ; j++){
+            //  cout << temp_item->coordinates[j] << " " ;
+             //}
+            //cout << endl;
+
+            //cout <<"Found distance : "<< temp_dist << endl;
+
+            int flag = 1;
+            //cout << "Adding an item to the range list" << endl;
+            if(!range.empty()){
+                for( int j = 0 ; j < range.size() ; j++){
+                    if( range[j]->id == temp_item->id ){
+                        flag = 0;
+                    }
+                }
+            }
+            if(flag){
+                range.push_back(temp_item);
+            }
+        }
+    }
+    else{
+        //cout << "Empty bucket" << endl;
+        return;
+    }
+}
+
+
 void Cosine_Hashtable::Range_Hashtable(vector<double>& c,uint32_t& t_size,double& R,vector<struct Item <double>*>& range){
 	struct Item <double>* temp_item = NULL;
 	double temp_dist;

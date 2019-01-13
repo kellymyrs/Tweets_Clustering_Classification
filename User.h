@@ -17,6 +17,7 @@
 #include <unordered_map>
 #include <complex>
 #include "utils.h"
+#include "Item.h"
 
 using namespace std;
 
@@ -36,7 +37,7 @@ struct User{
 		int flag = 0; //means that user talks about the coin within at least one tweet
 		int sum;
 
-		cout << "Creating vector U !!" << endl << endl;
+		//cout << "Creating vector U !!" << endl << endl;
 		
 		//calculate tweets' scores
 		for(int k = 0 ; k < tweets.size() ; k++){
@@ -77,9 +78,38 @@ struct User{
 
 		Normalise();
 
+
+#ifdef DEBUG
 		cout << "<--------Printing User-------->" << endl;
 		Print_User();
+#endif
+	}
 
+	bool Ignore_User(){
+		//check for zero vector
+		
+		int talk = 0; //user doesn't talk about bitcoins
+		double zero; //user has only 0 coins 
+		for(int i = 0 ; i < uex.size() ; i++){
+
+			if(uex[i]){
+				talk = 1;
+
+				zero = u[i];
+				if( zero != 0.0){
+					break;
+				}
+			}
+		
+		}
+
+		if(!talk || zero == 0.0){
+			cout << "I am going to ignore user : " << endl;
+			Print_User();
+			return true;
+		}
+
+		return false;
 	}
 
 	void Print_User(){
@@ -99,28 +129,59 @@ struct User{
 		cout << endl << endl;
 	}
 
-	void Normalise(){
-		double ex = 0,sum = 0 ,av;
+	double Average(vector <double> v){
+		double ex = 0.0,sum = 0.0,av;
 
-		for(int i = 0 ; i < u.size() ; i++){
-			if( u[i] != -10000){
-				sum += u[i];
+		for(int i = 0 ; i < v.size() ; i++){
+			if( v[i] != -10000){
+				sum += v[i];
 				ex++;
 			}
 			else{
-				u[i] = 0;
+				v[i] = 0;
 			}
 		}
+		if (ex != 0) {
+			av = sum / ex;
+			av = av / sqrt(av*av + 15);
+		}
+		else 
+			av = 0;
 
-		av = sum / ex;
-		av = av / sqrt(av*av + 15);
-		cout << "Average Sentiment : " << av << endl;
+		return av;
+	}
 
+
+	void Normalise(){
+		double av = Average(u);
+//#ifdef DEBUG 
+		//cout << "Average Sentiment : " << av << endl;
+//#endif
 		for(int i = 0 ; i < u.size() ; i++){
 			if(uex[i]){
 				u[i] -= av;
 			}
 		}		
+	}
+
+	void calculate_R(vector<struct Item <double>*>& pnearest,int &j){
+		double sum = 0.0 ,av = 0.0 ,total = 0.0, z;
+
+		for(int i = 0 ; i < pnearest.size() ; i++){
+			sum += pnearest[i]->Simularity(u);
+			av += Average(pnearest[i]->coordinates);
+			total += sum*av;
+		}
+
+		cout << "Sumary Simularity : " << sum << endl;
+		cout << "Sumary  Average : "<< av << endl;
+
+		if(!sum){
+			z = 1 / abs(sum);
+		}
+
+		u[j] = z * total;
+
 	}
 };
 

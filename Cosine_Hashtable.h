@@ -39,6 +39,7 @@ class Cosine_Hashtable{
 		void Insert_Hashtable(struct Item<double>* item,uint32_t& t_size);
 		struct Item<double>* NN_Hashtable(vector<double>& c,uint32_t& t_size,double& dist);
 		void Range_Hashtable(vector<double>& c,uint32_t& t_size,double& R,vector<struct Item <double>*>& range);
+		void Get_Bucket(vector<double>& c,uint32_t& t_size,vector<struct Item <double>*>& range);
 };
 
 #endif

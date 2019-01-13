@@ -42,6 +42,16 @@ void Cosine_Lsh_Hashtable::Range_Lsh(vector<double>& c,int& L,uint32_t& t_size,d
 	}
 }
 
+void Cosine_Lsh_Hashtable::Get_Buckets(vector<double>& c,int& L,uint32_t& t_size,vector<struct Item <double>*>& range){
+	//loop for every hashtable
+	//cout << endl << endl << "Range Search : Searching Cosine_Lsh_Hashtable !" << endl;
+	for (int i = 0 ; i < L ; i++){
+
+		lsh_hashtable[i]->Get_Bucket(c,t_size,range);
+
+	}	
+}
+
 struct Item<double>* Cosine_Lsh_Hashtable::NN_Lsh(vector<double>& c,int& L,uint32_t& t_size,double& min_dist){
 	//loop for every hashtable
 	double dist = min_dist = 10000000;

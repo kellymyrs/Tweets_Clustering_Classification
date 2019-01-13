@@ -16,7 +16,7 @@ void com_line_parser(int argc,char* argv[],ifstream& input_file,ofstream& output
 
 }
 
-void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d){
+void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int d){
 	string line,temp_str;
 	struct Tweet* tweet;
     struct User* user; 
@@ -49,7 +49,7 @@ void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d)
         //cout << "READ INPUT" << endl; 
         tweet = new struct Tweet(tweetid,w);
         if( userid == id){ //add new tweet to the existing user
-            cout << "Existing user " << endl;
+            //cout << "Existing user " << endl;
             if(users[i-1] != NULL && users[i-1]->tweets.size() != 0 ){
                 //cout << "OK" << endl;
                 users[i-1]->tweets.push_back(tweet);
@@ -60,7 +60,7 @@ void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d)
             //cout << "Tweet inserted ok" << endl;
         }
         else{//create a new user
-            cout << "New user " << endl;
+            //cout << "New user " << endl;
             user = new struct User(userid , tweet);
             users.push_back(user); 
             id = userid;
@@ -186,3 +186,94 @@ int read_bitcoins(vector<vector<string>> &bc_vect) {
 
     return 0;
 }
+
+
+void find_P_NN(vector <struct User*> &users,vector<struct Item <double>*>& pnearest,int &d){
+    Cosine_Lsh_Hashtable* co_h;
+    uint32_t t_size;
+    struct Item <double>* item;
+    int k = 4 ,L = 5;
+    double R = 0.9,temp_dist;
+    vector< pair<double,int> > dist;
+    vector<struct Item <double>*> range;
+
+    //create Cosine LSH Hashtable
+    co_h = new Cosine_Lsh_Hashtable(k,d,L);
+    t_size = pow(2,(k-1));
+
+    for (int i = 0; i < users.size(); ++i){ //inserting u vectors in the hashtable
+        if(!users[i]->Ignore_User()){    
+            item = new struct Item<double>(users[i]->id,users[i]->u,-1);
+
+            //cout << "Inserting" << endl;
+            co_h->Insert_Lsh_Hashtable(item,t_size,L);
+        }
+    }
+
+    for(int j = 0 ; j < users.size() ; j++){
+        if(!users[j]->Ignore_User()){
+
+            //range search
+            co_h->Get_Buckets(users[j]->u,L,t_size,range);
+            cout << "range size is -> " << range.size() << endl;
+
+            //find the distances from the neigbors and create a table with them to get the P nearest 
+            for( int i = 0 ; i < range.size() ; i++){
+
+                range[i]->Cosine_Distance(users[j]->u,temp_dist);
+                cout << "will insert {dist,i}->" <<"{" << temp_dist << "," << i << "}" << endl;
+                dist.push_back(make_pair(temp_dist,i));
+
+            }
+
+            cout << "Starting sorting" << endl;
+            sort(dist.begin(),dist.end());
+            
+            cout << "The vector after sort operation is:\n" ; 
+            for (int i=0; i < dist.size(); i++) { 
+                cout << "i->" << i << endl;
+                // "first" and "second" are used to access 
+                // 1st and 2nd element of pair respectively 
+                cout << dist[i].first << " "
+                     << dist[i].second << endl; 
+            } 
+
+            //P nearest neighbors
+            for(int i = 0 ; i < P ; i++ ){
+                cout << dist[i].second << endl;
+                pnearest.push_back(range[dist[i].second]);
+            }
+
+
+            for(int i = 0 ; i < pnearest.size() ; i++){
+                cout <<"item_id"<< pnearest[j]->id << " ";
+                for( int k = 0 ; k < d ; k++){
+                    cout << pnearest[i]->coordinates[k] << " ";
+                }
+                cout << endl;
+            }
+            break;
+        }
+    }
+}
+
+void unrated_items(vector <struct User*> &users,vector<struct Item <double>*>& pnearest){
+
+    for(int i = 0 ; i < users.size() ; i++){
+
+        if(!users[i]->Ignore_User()){
+
+            //for every unrated item
+            for( int j = 0 ; j < users[i]->u.size() ; j++){
+
+                if ( !(users[i]->uex[j]) ){ //if the item is unrated
+                    users[i]->calculate_R(pnearest,j);
+                }
+            }
+        }
+    }
+}
+
+// void find simularity(vector <struct User*> &users,vector<struct Item <double>*>& pnearest){
+
+// }

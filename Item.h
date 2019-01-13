@@ -62,6 +62,19 @@ struct Item{
 		temp_dist = 1 - cos;
 	}
 
+	double Simularity(vector<T>& v){
+		double sim,dot = 0.0, denom_a = 0.0, denom_b = 0.0;
+
+		for (int i = 0; i < coordinates.size() ; i++){
+		    dot += coordinates[i] * v[i] ;
+        	denom_a += coordinates[i] * coordinates[i] ;
+        	denom_b += v[i] * v[i] ;
+    	}
+    	sim = dot / (sqrt(denom_a) * sqrt(denom_b)) ;
+
+		return sim;
+	}
+
 	void Print_Item(){
         cout << "***Start print a POINT***" << '\n';
 

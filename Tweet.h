@@ -33,7 +33,8 @@ struct Tweet{
 	}
 
 	void Calculate_Score(map <string,double> dict){
-		cout << "Calculate score" << endl;
+		//cout << "Calculate score" << endl;
+		
 		for(int i = 0 ; i < words.size() ; i++){
 			score += dict[words[i]];
 		}

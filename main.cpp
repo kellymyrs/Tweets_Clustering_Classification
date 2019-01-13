@@ -1,7 +1,5 @@
 #include "utils.h"
 
-#define P 20
-
 using namespace std;
 
 int main(int argc,char* argv[]){	
@@ -11,15 +9,14 @@ int main(int argc,char* argv[]){
 	char* com;
 	string line,temp_str;
 	vector <struct User*> users;
-	vector<struct Item <double>*> items,range;
-	struct Item <double>* item,* nn = NULL;
-	string metric;
+	vector<struct Item <double>*> pnearest;
 	vector<Cluster* > clusters;
 	vector<Cluster* > old_clusters;
 	int t;
 	vector<double> s;
 	double 	ov = 0.0;
 	double exec_time;
+
 
 	srand (time(NULL));
 
@@ -36,7 +33,19 @@ int main(int argc,char* argv[]){
 	read_bitcoins(bc_vect);
 
 	for(i = 0 ; i < users.size() ; i++){
+	 	
 	 	users[i]->Create_U(bc_vect,lex_map);
+	
 	}
+
+	for(i = 0 ; i < users.size() ; i++){
+		users[i]->Print_User();
+	}
+
+	find_P_NN(users,pnearest,bc_vect.size());
+
+	unrated_items(users,pnearest);
+
+	
 	return 1;
 }
