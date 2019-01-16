@@ -28,7 +28,7 @@ struct Tweet{
 
 	Tweet(int i,vector<string> v){
 		id = i;
-		score = 0;
+		score = -1;
 		words = v;
 	}
 

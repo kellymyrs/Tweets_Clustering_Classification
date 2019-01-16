@@ -24,12 +24,21 @@ using namespace std;
 struct User{
 	int id;
   	vector <double> u;
+  	vector <double> ux;
+  	int norm;
 	vector <bool> uex;
 	vector <struct Tweet*> tweets;
 
 	User(int i,struct Tweet* tweet){
 		id = i;
+		norm = 1;
 		tweets.push_back(tweet);
+	}
+
+	User(int i,vector <struct Tweet*> t){
+		id = i;
+		norm = 1;
+		tweets = t;
 	}
 
 
@@ -38,10 +47,18 @@ struct User{
 		int sum;
 
 		//cout << "Creating vector U !!" << endl << endl;
-		
+		if(tweets.size() == 0){
+			for(int i = 0 ; i < coins.size() ; i++){
+				u.push_back(0);
+				uex.push_back(false);				
+			}
+		}
+
 		//calculate tweets' scores
-		for(int k = 0 ; k < tweets.size() ; k++){
-			tweets[k]->Calculate_Score(lex);
+		if(tweets[0]->score = -1){
+			for(int k = 0 ; k < tweets.size() ; k++){
+				tweets[k]->Calculate_Score(lex);
+			}
 		}
 
 		//search each coin
@@ -76,6 +93,8 @@ struct User{
 			}
 		}
 
+		ux = u;
+
 		Normalise();
 
 
@@ -84,6 +103,7 @@ struct User{
 		Print_User();
 #endif
 	}
+
 
 	bool Ignore_User(){
 		//check for zero vector
@@ -103,10 +123,29 @@ struct User{
 		
 		}
 
-		if(!talk || zero == 0.0){
-			cout << "I am going to ignore user : " << endl;
-			Print_User();
+		if(!talk){
+			//cout << "I am going to ignore user : " << endl;
+			//Print_User();
 			return true;
+		}
+		if(zero = 0.0){ //check ux to see if all the existing values are the same 
+			double value;
+			for(int i = 0; i < ux.size() ; i++){ //initialise value
+				if(uex[i]){
+					value = ux[i];
+					break;
+				}
+
+			}			
+
+			for(int i = 0; i < ux.size() ; i++){
+				if(uex[i] == true && ux[i]!=value){
+					return false;
+				}
+			}
+			norm = 0;
+			return true;
+
 		}
 
 		return false;
@@ -121,8 +160,14 @@ struct User{
 			tweets[i]->Print_Tweet();
 		}
 
+		cout << "U before Normalisation : ";
+		for(int i = 0 ; i < ux.size() ; i++){
+			cout << ux[i] <<" ";
+		}	
+		cout << endl;	
 
-		cout << " U : ";
+
+		cout << " U after Normalisation : ";
 		for(int i = 0 ; i < u.size() ; i++){
 			cout << u[i] <<" ";
 		}
@@ -161,6 +206,10 @@ struct User{
 			if(uex[i]){
 				u[i] -= av;
 			}
+			else{
+				u[i] = 0;
+				ux[i] = av;
+			}
 		}		
 	}
 
@@ -173,8 +222,8 @@ struct User{
 			total += sum*av;
 		}
 
-		cout << "Sumary Simularity : " << sum << endl;
-		cout << "Sumary  Average : "<< av << endl;
+		//cout << "Sumary Simularity : " << sum << endl;
+		//cout << "Sumary  Average : "<< av << endl;
 
 		if(!sum){
 			z = 1 / abs(sum);

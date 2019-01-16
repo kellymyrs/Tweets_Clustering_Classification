@@ -17,8 +17,12 @@ void random_selection(vector<struct Item <double>*> items,int& n_clusters,int& N
 			
 		items[c-1]->cluster_id = 0; //turn this point to a centroid
 
+		cout << "Created a centroid!" << endl;
+
 		cluster = new Cluster(items[c-1]);
 		clusters.push_back(cluster);
+
+		cout << "Created a new cluster!" << endl;
 
 	}
 

@@ -16,7 +16,7 @@ void com_line_parser(int argc,char* argv[],ifstream& input_file,ofstream& output
 
 }
 
-void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d){
+void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d,map<int, struct Tweet*> &totaltweets){
 	string line,temp_str;
 	struct Tweet* tweet;
     struct User* user; 
@@ -48,6 +48,7 @@ void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d)
 
         //cout << "READ INPUT" << endl; 
         tweet = new struct Tweet(tweetid,w);
+        totaltweets[tweetid] = tweet;
         if( userid == id){ //add new tweet to the existing user
             //cout << "Existing user " << endl;
             if(users[i-1] != NULL && users[i-1]->tweets.size() != 0 ){
@@ -188,91 +189,138 @@ int read_bitcoins(vector<vector<string>> &bc_vect) {
 }
 
 
-void find_P_NN(vector <struct User*> &users,vector<struct Item <double>*>& pnearest,int d){
-    Cosine_Lsh_Hashtable* co_h;
-    uint32_t t_size;
+
+
+void read_oldinput(vector<struct Item <double>*> &items){
+    string line,temp_str;
+    vector<double> coordinates; //coordinates
     struct Item <double>* item;
-    int k = 4 ,L = 5;
-    double R = 0.9,temp_dist;
-    vector< pair<double,int> > dist;
-    vector<struct Item <double>*> range;
+    int i = 1,ident;
+    ifstream oldinput_file;
+    int m = 1; //cosine metric
 
-    //create Cosine LSH Hashtable
-    co_h = new Cosine_Lsh_Hashtable(k,d,L);
-    t_size = pow(2,(k-1));
-
-    for (int i = 0; i < users.size(); ++i){ //inserting u vectors in the hashtable
-        if(!users[i]->Ignore_User()){    
-            item = new struct Item<double>(users[i]->id,users[i]->u,-1);
-
-            //cout << "Inserting" << endl;
-            co_h->Insert_Lsh_Hashtable(item,t_size,L);
-        }
+    oldinput_file.open("twitter_dataset_small_v2.csv");
+    if(!oldinput_file.is_open()){
+        cout << "Cannnot open the old input file" << endl ;
     }
 
-    for(int j = 0 ; j < users.size() ; j++){
-        if(!users[j]->Ignore_User()){
+    while(getline(oldinput_file,line)) {
 
-            //range search
-            co_h->Get_Buckets(users[j]->u,L,t_size,range);
-            cout << "range size is -> " << range.size() << endl;
+        ident = i;
+        
+        istringstream curr_line(line);
+        getline(curr_line, temp_str, ',');
+        
+        // d = 1;
+        while (getline(curr_line, temp_str, ',')) {
 
-            //find the distances from the neigbors and create a table with them to get the P nearest 
-            for( int i = 0 ; i < range.size() ; i++){
+            //cout << stod(temp_str.c_str()) << " ";
+            coordinates.push_back(atof(temp_str.c_str())); 
+            // d++;
+        }
+        //cout << endl;
 
-                range[i]->Cosine_Distance(users[j]->u,temp_dist);
-                cout << "will insert {dist,i}->" <<"{" << temp_dist << "," << i << "}" << endl;
-                dist.push_back(make_pair(temp_dist,i));
+        item = new struct Item<double>(ident , coordinates, -1);
+        items.push_back(item);
 
-            }
+        coordinates.clear();
+        
+        i++;
+    }
 
-            cout << "Starting sorting" << endl;
-            sort(dist.begin(),dist.end());
+    oldinput_file.close();
+    
+    // d--;
+    // N = i-1;
+
+    // // for( i = 0 ; i < N ; i++ ){
+    // //     items[i]->Print_Item();
+    // // }
+    
+    // cout << "Number of points = " << N << endl;
+    // cout << "Dimension = " << d << endl;
+        
+}
+
+void read_conf(int& k, int & L, int& n_clusters ){
+    ifstream conf_file;
+    string line,temp_str;   
+
+    conf_file.open("cluster.conf");
+    if(!conf_file.is_open()){
+        cout << "Cannnot open the configuration file" << endl ;
+    }   
+
+    while(getline(conf_file,line)){
+
+        istringstream curr_line(line);
+
+        getline(curr_line, temp_str, ' ');
+
+        if(!temp_str.compare("number_of_clusters:")){
             
-            cout << "The vector after sort operation is:\n" ; 
-            for (int i=0; i < dist.size(); i++) { 
-                cout << "i->" << i << endl;
-                // "first" and "second" are used to access 
-                // 1st and 2nd element of pair respectively 
-                cout << dist[i].first << " "
-                     << dist[i].second << endl; 
-            } 
-
-            //P nearest neighbors
-            for(int i = 0 ; i < P ; i++ ){
-                cout << dist[i].second << endl;
-                pnearest.push_back(range[dist[i].second]);
-            }
-
-
-            for(int i = 0 ; i < pnearest.size() ; i++){
-                cout <<"item_id"<< pnearest[j]->id << " ";
-                for( int k = 0 ; k < d ; k++){
-                    cout << pnearest[i]->coordinates[k] << " ";
-                }
-                cout << endl;
-            }
-            break;
+            getline(curr_line, temp_str, ' ');
+            n_clusters = atoi(temp_str.c_str());
+            
         }
-    }
-}
+        else if(!temp_str.compare("number_of_hash_functions:")){
 
-void unrated_items(vector <struct User*> &users,vector<struct Item <double>*>& pnearest){
-
-    for(int i = 0 ; i < users.size() ; i++){
-
-        if(!users[i]->Ignore_User()){
-
-            //for every unrated item
-            for( int j = 0 ; j < users[i]->u.size() ; j++){
-
-                if ( !(users[i]->uex[j]) ){ //if the item is unrated
-                    users[i]->calculate_R(pnearest,j);
-                }
+            getline(curr_line, temp_str, ' ');
+            if(temp_str.compare("")){
+               k = atoi(temp_str.c_str());
             }
         }
+        else if(!temp_str.compare("number_of_hash_tables:")){
+
+            getline(curr_line, temp_str, ' ');
+            if(temp_str.compare("")){
+               L = atoi(temp_str.c_str());
+            }
+        }        
     }
+
+    conf_file.close();
+
+    cout << "Number of clusters = " << n_clusters << endl;
+    cout << "Number of hash functions = " << k << endl;
+    cout << "Number of Hashtables = " << L << endl;
+    
 }
+
+
+// void u_problem(vector <struct User*> &users,vector < vector< pair<double,int> > > &dist,ofstream& output_file){
+//     vector< pair<int,int> > coins; //number of neighbors that talk about the coin,number of coin
+    
+//     for(int i = 0 ; i < users.size() ; i++ ){
+
+//         if(!users[i]->Ignore_User()){
+
+//             //for every unrated item
+//             for( int j = 0 ; j < users[i]->u.size() ; j++){
+
+//                 if ( !(users[i]->uex[j]) ){ //if the item is unrated
+                    
+//                     //search neighbors
+//                     for(int n = 0; n < dist[i].size ; n++){
+
+//                         if( users[dist[n][0].second]->uex[n] ){
+//                             coins
+//                         } 
+//                     }
+
+//                 }
+//                 else{
+//                     coins[j].first = -1;
+//                     coins[j].second = j;
+//                 }
+//             }
+//             //print coins
+
+//             coins.clear();
+//         }
+//     }
+// }
+
 
 // void find simularity(vector <struct User*> &users,vector<struct Item <double>*>& pnearest){
 

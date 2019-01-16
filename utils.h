@@ -30,6 +30,10 @@
 #include "Item.h"
 #include "G.h"
 #include "Cosine_Lsh_Hashtable.h"
+#include "Initialisation.h"
+#include "Assignment.h"
+#include "Update.h"
+#include "Evaluation.h"
 
 #define F_LEX "./vader_lexicon.csv"
 #define F_BIT "./coins_queries.csv"
@@ -37,11 +41,12 @@
 using namespace std;
 
 void com_line_parser(int ,char** ,ifstream &,ofstream &,int &);
-void read_input(ifstream &,vector <struct User*> &,int &,int &);
+void read_input(ifstream &input_file,vector <struct User*> &users,int &N,int &d,map<int, struct Tweet*> &totaltweets);
 
 int read_lex(map<string, double> &);
 int read_bitcoins(vector<vector<string>> &);
 
-void find_P_NN(vector <struct User*> &,vector<struct Item <double>*>&,int);
-void unrated_items(vector <struct User*> &,vector<struct Item <double>*>&);
+void read_oldinput(vector<struct Item <double>*> &items);
+void read_conf(int& k, int & L, int& n_clusters );
+
 #endif
